@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "emirates-hud"
+version = "0.1.0"
+description = "UAE Micro-Mobility Compliance & Safety HUD Engine"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Poolside", email = "ai-infra@example.com" },
+]
+keywords = [
+    "pydantic",
+    "open-telemetry",
+    "micro-mobility",
+    "computer-vision",
+    "compliance",
+    "uae",
+    "rta",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+dependencies = [
+    "pydantic>=2.5,<3.0",
+    "pydantic-settings>=2.0,<3.0",
+    "opentelemetry-api>=1.20",
+    "opentelemetry-sdk>=1.20",
+    "opentelemetry-exporter-otlp-proto-http>=1.20",
+    "opentelemetry-semantic-conventions>=0.40b0",
+    "opentelemetry-proto>=1.20",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+]
+
+[tool.setuptools]
+packages = ["src", "src.schemas", "src.telemetry"]
+
+[tool.pytest.ini_options]
+minversion = "7.4"
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-ra -q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+# A focused, non-opinionated ruleset: pyflakes + pycodestyle + isort +
+# pyupgrade + comprehensions + RUF. We deliberately omit flake8-bugbear /
+# flake8-simplify / flake8-bandit because their "blind except" / nested-with
+# rules conflict with the intentional defensive guards in the telemetry layer.
+select = ["E", "F", "W", "I", "UP", "C4", "RUF"]
+# E501 is intentionally disabled: long ``Field(description=...)`` values and
+# sorted ``__all__`` lists stay far more readable when not hard-wrapped, and the
+# project relies on the line-length as a soft guideline rather than a gate.
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src", "tests"]
