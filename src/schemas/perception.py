@@ -110,6 +110,10 @@ class DetectionResult(BaseModel):
     frame_id: int = Field(ge=0, description="Monotonic frame identifier.")
     timestamp_ms: int = Field(ge=0, description="Epoch time in milliseconds.")
     processing_time_ms: float = Field(ge=0.0, description="Per-frame wall-clock processing time (ms).")
+    low_confidence: bool = Field(
+        default=False,
+        description="True when results may be unreliable (empty frame, mock engine, or fallback).",
+    )
 
     @property
     def detection_count(self) -> int:
@@ -156,6 +160,7 @@ class DetectionResult(BaseModel):
             frame_id=self.frame_id,
             timestamp_ms=self.timestamp_ms,
             processing_time_ms=self.processing_time_ms,
+            low_confidence=self.low_confidence,
         )
 
     def filter_by_confidence(self, min_confidence: float = 0.0) -> DetectionResult:
@@ -172,6 +177,7 @@ class DetectionResult(BaseModel):
             frame_id=self.frame_id,
             timestamp_ms=self.timestamp_ms,
             processing_time_ms=self.processing_time_ms,
+            low_confidence=self.low_confidence,
         )
 
 

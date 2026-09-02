@@ -40,6 +40,7 @@ dependencies = [
     "opentelemetry-exporter-otlp-proto-http>=1.20",
     "opentelemetry-semantic-conventions>=0.40b0",
     "opentelemetry-proto>=1.20",
+    "numpy>=1.24",
 ]
 
 [project.optional-dependencies]
@@ -47,9 +48,22 @@ dev = [
     "pytest>=7.4",
     "pytest-cov>=4.1",
 ]
+perception = [
+    "ultralytics>=8.0",
+    "torch>=2.0",
+    "opencv-python-headless>=4.8",
+]
+train = [
+    "ultralytics[onnx]>=8.0",
+    "torch>=2.0",
+    "opencv-python-headless>=4.8",
+    "onnx>=1.14",
+    "onnxruntime>=1.16",
+    "pyyaml>=6.0",
+]
 
 [tool.setuptools]
-packages = ["src", "src.schemas", "src.telemetry"]
+packages = ["src", "src.schemas", "src.perception", "src.telemetry"]
 
 [tool.pytest.ini_options]
 minversion = "7.4"
