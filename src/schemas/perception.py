@@ -131,5 +131,48 @@ class DetectionResult(BaseModel):
             counts[box.class_name] = counts.get(box.class_name, 0) + 1
         return counts
 
+    # ------------------------------------------------------------------ filters
+    def filter_by_class(self, class_names: str | list[str]) -> DetectionResult:
+        """Return a new ``DetectionResult`` keeping only the requested classes.
+
+        ``class_names`` may be a single class name or a list of names. The
+        returned result preserves the original ``frame_id``, ``timestamp_ms``
+        and ``processing_time_ms`` metadata, only the ``boxes`` list is
+        filtered. Class matching is case-sensitive and exact.
+
+        Example::
+
+            result = DetectionResult(...)
+            scooters = result.filter_by_class("scooter")
+            people_and_scooters = result.filter_by_class(["scooter", "person"])
+        """
+        if isinstance(class_names, str):
+            wanted = {class_names}
+        else:
+            wanted = set(class_names)
+        filtered = [b for b in self.boxes if b.class_name in wanted]
+        return DetectionResult(
+            boxes=filtered,
+            frame_id=self.frame_id,
+            timestamp_ms=self.timestamp_ms,
+            processing_time_ms=self.processing_time_ms,
+        )
+
+    def filter_by_confidence(self, min_confidence: float = 0.0) -> DetectionResult:
+        """Return a new ``DetectionResult`` dropping detections below a threshold.
+
+        ``min_confidence`` is the inclusive lower bound for ``confidence``.
+        Metadata fields are preserved as with :meth:`filter_by_class`.
+        """
+        if not 0.0 <= min_confidence <= 1.0:
+            raise ValueError("min_confidence must be in [0.0, 1.0]")
+        filtered = [b for b in self.boxes if b.confidence >= min_confidence]
+        return DetectionResult(
+            boxes=filtered,
+            frame_id=self.frame_id,
+            timestamp_ms=self.timestamp_ms,
+            processing_time_ms=self.processing_time_ms,
+        )
+
 
 __all__ = ["BoundingBox", "DetectionResult"]

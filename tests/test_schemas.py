@@ -129,6 +129,85 @@ class TestDetectionResult:
         with pytest.raises(ValidationError):
             DetectionResult(frame_id=0, timestamp_ms=0, processing_time_ms=-0.1)
 
+    # -- filter_by_class --------------------------------------------------------
+    def _multi_class_result(self) -> DetectionResult:
+        return DetectionResult(
+            boxes=[
+                _bbox(class_name="scooter", confidence=0.9),
+                _bbox(class_name="person", confidence=0.8),
+                _bbox(class_name="scooter", confidence=0.7),
+                _bbox(class_name="bike", confidence=0.6),
+            ],
+            frame_id=5,
+            timestamp_ms=1_700_000_000_000,
+            processing_time_ms=12.5,
+        )
+
+    def test_filter_by_class_single_string(self):
+        r = self._multi_class_result()
+        scooters = r.filter_by_class("scooter")
+        assert scooters.detection_count == 2
+        assert all(b.class_name == "scooter" for b in scooters.boxes)
+
+    def test_filter_by_class_list(self):
+        r = self._multi_class_result()
+        filtered = r.filter_by_class(["person", "bike"])
+        assert filtered.detection_count == 2
+        names = {b.class_name for b in filtered.boxes}
+        assert names == {"person", "bike"}
+
+    def test_filter_by_class_preserves_metadata(self):
+        r = self._multi_class_result()
+        filtered = r.filter_by_class("scooter")
+        assert filtered.frame_id == r.frame_id
+        assert filtered.timestamp_ms == r.timestamp_ms
+        assert filtered.processing_time_ms == r.processing_time_ms
+
+    def test_filter_by_class_no_match(self):
+        r = self._multi_class_result()
+        filtered = r.filter_by_class("unknown")
+        assert filtered.detection_count == 0
+        assert filtered.boxes == []
+
+    def test_filter_by_class_returns_independent_list(self):
+        r = self._multi_class_result()
+        filtered = r.filter_by_class("scooter")
+        # The filtered result has its own boxes list (not a view of the original).
+        assert filtered.boxes is not r.boxes
+        assert len(filtered.boxes) != len(r.boxes)
+
+    def test_filter_by_class_empty_result(self):
+        r = DetectionResult(frame_id=0, timestamp_ms=0, processing_time_ms=1.0)
+        filtered = r.filter_by_class("scooter")
+        assert filtered.detection_count == 0
+        assert filtered.frame_id == 0
+
+    # -- filter_by_confidence --------------------------------------------------
+    def test_filter_by_confidence_threshold(self):
+        r = self._multi_class_result()
+        confident = r.filter_by_confidence(0.8)
+        assert confident.detection_count == 2
+        assert all(b.confidence >= 0.8 for b in confident.boxes)
+
+    def test_filter_by_confidence_preserves_metadata(self):
+        r = self._multi_class_result()
+        filtered = r.filter_by_confidence(0.75)
+        assert filtered.frame_id == r.frame_id
+        assert filtered.timestamp_ms == r.timestamp_ms
+        assert filtered.processing_time_ms == r.processing_time_ms
+
+    def test_filter_by_confidence_invalid_range(self):
+        r = self._multi_class_result()
+        with pytest.raises(ValueError, match="min_confidence"):
+            r.filter_by_confidence(1.5)
+        with pytest.raises(ValueError, match="min_confidence"):
+            r.filter_by_confidence(-0.1)
+
+    def test_filter_by_confidence_zero_keeps_all(self):
+        r = self._multi_class_result()
+        filtered = r.filter_by_confidence(0.0)
+        assert filtered.detection_count == r.detection_count
+
 
 # --------------------------------------------------------------------------- #
 # SpatialCoordinate
