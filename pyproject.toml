@@ -17,6 +17,9 @@ keywords = [
     "open-telemetry",
     "micro-mobility",
     "computer-vision",
+    "geospatial",
+    "openstreetmap",
+    "overpass",
     "compliance",
     "uae",
     "rta",
@@ -63,7 +66,7 @@ train = [
 ]
 
 [tool.setuptools]
-packages = ["src", "src.schemas", "src.perception", "src.telemetry"]
+packages = ["src", "src.geospatial", "src.schemas", "src.perception", "src.telemetry"]
 
 [tool.pytest.ini_options]
 minversion = "7.4"
