@@ -23,6 +23,10 @@ keywords = [
     "compliance",
     "uae",
     "rta",
+    "vlm",
+    "multimodal",
+    "qwen2-vl",
+    "rta-resolution-13",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -64,9 +68,15 @@ train = [
     "onnxruntime>=1.16",
     "pyyaml>=6.0",
 ]
+vlm = [
+    "transformers[torch]>=4.46",
+    "peft>=0.10",
+    "bitsandbytes>=0.43",
+    "Pillow>=10.0",
+]
 
 [tool.setuptools]
-packages = ["src", "src.geospatial", "src.schemas", "src.perception", "src.telemetry"]
+packages = ["src", "src.geospatial", "src.schemas", "src.perception", "src.telemetry", "src.vlm"]
 
 [tool.pytest.ini_options]
 minversion = "7.4"
