@@ -27,6 +27,9 @@ keywords = [
     "multimodal",
     "qwen2-vl",
     "rta-resolution-13",
+    "state-engine",
+    "state-machine",
+    "trigger-router",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -76,7 +79,7 @@ vlm = [
 ]
 
 [tool.setuptools]
-packages = ["src", "src.geospatial", "src.schemas", "src.perception", "src.telemetry", "src.vlm"]
+packages = ["src", "src.geospatial", "src.schemas", "src.perception", "src.telemetry", "src.vlm", "src.state_engine"]
 
 [tool.pytest.ini_options]
 minversion = "7.4"
