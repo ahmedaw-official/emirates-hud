@@ -160,7 +160,8 @@ def rule_based_fallback_audit(
     has_crosswalk = any(
         "crosswalk" in c or "zebra" in c for c in class_names
     )
-    has_sidewalk = "sidewalk" in class_names
+    has_sidewalk = any("sidewalk" in c for c in class_names)
+    has_grey_sidewalk = "grey_sidewalk" in class_names
 
     violations: list[ViolationDetail] = []
     dismount_required = False
@@ -206,7 +207,20 @@ def rule_based_fallback_audit(
         )
         risk_level = RiskLevel.CRITICAL
 
-    # --- Pedestrian / prohibited highway types ---
+    # --- Grey sidewalk detected via YOLO (implies sidewalk riding) ---
+    if has_grey_sidewalk:
+        violations.append(
+            ViolationDetail(
+                violation_type=ViolationType.SIDEWALK_DISOBEDENCE,
+                legal_reference=rta_art4,
+                fine_amount_aed=250,
+            )
+        )
+        if risk_level != RiskLevel.CRITICAL:
+            risk_level = RiskLevel.HIGH
+        dismount_required = True
+
+    # --- Pedestrian / prohibited highway types (from OSM) ---
     if osm_policy.highway_type.lower() in {"footway", "pedestrian", "steps"}:
         violations.append(
             ViolationDetail(
