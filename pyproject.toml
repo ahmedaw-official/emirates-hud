@@ -30,6 +30,9 @@ keywords = [
     "state-engine",
     "state-machine",
     "trigger-router",
+    "hud-compositor",
+    "video-processor",
+    "opencv",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -79,7 +82,7 @@ vlm = [
 ]
 
 [tool.setuptools]
-packages = ["src", "src.geospatial", "src.schemas", "src.perception", "src.telemetry", "src.vlm", "src.state_engine"]
+packages = ["src", "src.config", "src.geospatial", "src.hud", "src.schemas", "src.perception", "src.telemetry", "src.vlm", "src.state_engine"]
 
 [tool.pytest.ini_options]
 minversion = "7.4"
